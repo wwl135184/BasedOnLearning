@@ -310,3 +310,97 @@ console.log('============================================================');
 {
     console.log([1, undefined, 2].map((x = 'yes') => x));
 }
+
+console.log('============================================================');
+
+// 用途
+
+// 交换变量的值
+
+{
+    let x = 1;
+    let y = 2;
+    [x, y] = [y, x];
+    console.log(x);
+    console.log(y);
+}
+
+// 从函数返回多个值
+
+{
+    function example() {
+        return [1, 2, 3];
+    }
+    let [a, b, c] = example();
+    console.log(a);
+
+    function exampleObj() {
+        return {
+            foo: 1,
+            boo: 2
+        }
+    }
+    let { foo, bar } = exampleObj();
+    console.log(foo);
+}
+
+// 函数参数的定义
+
+// 解构赋值可以方便地将一组参数与变量名对应起来
+
+{
+    // 参数是一组有次序的值
+    function f([x, y, z]) {}
+
+    // 参数是一组无次序的值
+    function fObj({x, y, z}) {}
+
+    // fObj({z: 3, y: 2, x: 1})
+}
+
+// 提取JSON数据
+
+{
+    let jsonData = {
+        id: 42,
+        status: 'OK',
+        data: [1, 2]
+    }
+
+    let { id, status, data: number } = jsonData;
+    console.log(id);
+    console.log(status);
+    console.log(number);
+}
+
+// 函数参数的默认值
+
+// 遍历Map结构
+
+{
+    const map = new Map();
+    map.set('first', 'hello');
+    map.set('second', 'world');
+
+    for(let [key, value] of map) {
+        console.log(key + " is " + value);
+    }
+
+    // 获取键值
+
+    for(let [key] of map) {
+
+    }
+
+    for(let [,value] of map) {
+
+    }
+}
+
+// 输入模块的指定方法
+
+{
+    // const { SourceMapConsumer, SourceNode } = require("source-map");
+}
+
+
