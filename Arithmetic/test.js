@@ -66,3 +66,104 @@
 
     console.log(noRepeatStringLength(string));
 }
+
+// 栈的实现
+
+{
+    function Stack() {
+        this.dataStore = [];
+        this.top = 0;
+        this.push = push;
+        this.pop = pop;
+        this.peek = peek;
+        this.clear = clear;
+        this.length = length;
+    }
+
+    function push(element) {
+        this.dataStore[this.top++] = element;
+    }
+
+    function pop() {
+        return this.dataStore[--this.top];
+    }
+
+    function peek() {
+        return this.dataStore[this.top - 1];
+    }
+
+    function length() {
+        return this.top;
+    }
+
+    function clear() {
+        this.top = 0;
+    }
+
+    let s = new Stack();
+    s.push('David');
+    console.log(s.length());
+    s.push('Raymond');
+    s.push('Bryan');
+    console.log(s.dataStore);
+    console.log(s.length());
+    // console.log(s.pop());
+    // s.clear();
+    console.log(s.dataStore);
+    console.log(s.peek());
+
+    // 进制转化
+    function mulBase(num, base) {
+        let s = new Stack();
+        do {
+            s.push(num % base);
+            num = Math.floor(num /= base); // Math.floor() 返回最大整数
+        } while(num > 0) {
+            var converted = '';
+            while(s.length() > 0) {
+                converted += s.pop();
+            }
+        } 
+        return converted;
+    }
+    console.log(mulBase(17, 2));
+
+    // 判断是否为回文
+    function isPalindrome(word) {
+        let s = new Stack();
+        for(var i = 0; i < word.length; i++) {
+            s.push(word[i]);
+        }
+        let rword = '';
+        while(s.length() > 0) {
+            rword += s.pop();
+        }
+        if(word == rword) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    console.log(isPalindrome('dad'));
+
+    // 递归
+    function factorial(n) {
+        if(n === 0) {
+            return 1;
+        } else {
+            return n * factorial(n - 1);
+        }
+    }
+
+    console.log(factorial(6));
+}
+
+// num++与++num的区别
+{
+    let a = 0, d = 0;
+    const b = a++; // 先赋值，再加1
+    const c = ++d; // 先加1，再赋值
+    console.log(b);
+    console.log(c);
+}
