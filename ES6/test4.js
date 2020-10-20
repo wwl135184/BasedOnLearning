@@ -19,7 +19,7 @@ console.log('============================================================');
 // ES6还原原生字符串String对象，提供一个String.row()方法。该方法返回一个斜杠被转义（即斜杠前面再加一个斜杠）的字符串。
 
 {
-    const string = String.raw`Hi\n${2+3}!`; ·
+    const string = String.raw`Hi\n${2+3}!`;
     console.log(string);
 
     console.log(String.raw`Hi\\n` === 'Hi\\\\n');
