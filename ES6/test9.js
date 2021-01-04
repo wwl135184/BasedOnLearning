@@ -96,3 +96,236 @@ console.log('============================================================');
     const obj = Object.assign({}, obj0, obj1);
     console.log(obj); // { a: { b: 'hello world' } } 
 }
+
+// 数组的处理
+// Object.assign()可以用来处理数组，但是会把数组视为对象
+
+{
+    const arr = Object.assign([1, 2, 3], [4, 5]);
+    console.log(arr); // [4, 5, 3]
+}
+
+// 取值函数的处理
+// Object.assign()只能进行值的复制，若果复制的值是一个取值函数，那么将求值后再复制
+
+{
+    const source = {
+        get foo() { return 1 }
+    }
+    const target = {};
+    const obj = Object.assign(target, source);
+    console.log(obj); // { foo: 1 }
+}
+
+console.log('============================================================');
+
+// 常见通途
+
+// 为对象添加属性
+
+{
+    class Point {
+        constructor(x, y) {
+            Object.assign(this, {x, y});
+        }
+    }
+}
+
+// 为对象添加方法
+
+{
+    // Object.assign(SomeClass.prototype, {
+    //     someMethod(arg1, arg2) {
+
+    //     },
+    //     anotherMethod() {
+
+    //     }
+    // })
+
+    // 等同于下面写法
+
+    // SomeClass.prototype.someMethod = function(arg1, arg2) {
+
+    // }
+
+    // SomeClass.prototype.antherMethod = function() {
+
+    // }
+}
+
+// 克隆对象
+
+{
+    function clone(origin) {
+        return Object.assign({}, origin);
+    }
+}
+
+// 不过，采用这种方法克隆，只能克隆原始对象自身的值，不能克隆它继承的值。如果想要保持继承链，可以采用下面的代码。
+
+{
+    function clone(origin) {
+        let originProto = Object.getPrototypeOf(origin);
+        return Object.assign(Object.create(originProto), origin);
+    }
+}
+
+// 合并多个对象
+
+// 将多个对象合并到某个对象
+
+{
+    const merge = (target, ...souce) => Object.assign(target, ...souce);
+}
+
+// 如果希望合并后返回一个新对象，可以改写上面的函数，对一个空对象合并
+
+{
+    const merge = (...source) => Object.assign({}, ...source);
+}
+
+// 为属性指定默认值
+
+{
+    const DEFAULTS = {
+        logLevel: 0,
+        outputFormat: 'html'
+    }
+    function processContent(options) {
+        options = Object.assign({}, DEFAULTS, options);
+        console.log(options);
+    }
+    processContent({});
+}
+
+// 由于浅拷贝的问题，DEFAULTS对象和options对象的所有属性的值，最好都是简单类型，不能指向另一个对象。否则，DEFAULTS对象的该属性很可能不起作用
+
+console.log('============================================================');
+
+// Object.getOwnPropertyDescriptors()
+
+// ES5的Object.getOwnPropertyDescriptor()方法返回某个对象属性的描述（descriptor）。ES2017引入了Object.getOwnPropertyDescriptors()方法，返回指定对象所有自身属性（非集成属性）的描述对象。
+
+{
+    const obj = {
+        foo: '123',
+        get bar() { return 'abc' }
+    }
+    console.log(Object.getOwnPropertyDescriptors(obj));
+}
+
+{
+    function getOwnPropertyDescriptors(obj) {
+        const result = {};
+        for(let key of Reflect.ownKeys(obj)) {
+            result[key] = Object.getOwnPropertyDescriptor(obj, key);
+        }
+        return result;
+    }
+    const obj = {
+        foo: '123',
+        get bar() { return 'abc' }
+    }
+    console.log(getOwnPropertyDescriptors(obj));
+}
+
+// 改方法的引入目的，只要是为了解决Object.assign()无法正确拷贝get属性和set属性的问题。
+
+{
+    const source = {
+        set foo(value) {
+            console.log(value);
+        }
+    }
+    const target1 = {};
+    Object.assign(target1, source);
+    console.log(Object.getOwnPropertyDescriptor(target1, 'foo'));
+}
+
+{
+    const source = {
+        set foo(value) {
+            console.log(value);
+        }
+    }
+    const target2 = {};
+    Object.defineProperties(target2, Object.getOwnPropertyDescriptors(source));
+    console.log(Object.getOwnPropertyDescriptor(target2, 'foo'));
+}
+
+{
+    const showllowMerge = (target, souce) => Object.defineProperties(
+        target,
+        Object.getOwnPropertyDescriptors(souce)
+    )
+}
+
+// Object.getOwnPropertyDescriptors()方法的另一个用处，是配合Object.create()方法，将对象属性克隆到一个新对象。这属于浅拷贝
+
+{
+    // const clone = Object.create(Object.getPrototypeOf(Obj), Object.getOwnPropertyDescriptors(obj));
+    const shallowClone = (Obj) => Object.create(
+        Object.getPrototypeOf(Obj),
+        Object.getOwnPropertyDescriptors(Obj)
+    )
+}
+
+// Object.getOwnPropertyDescriptors()方法可以实现一个对象继承另一个对象
+
+{
+    // const obj = Object.create(
+    //     prot,
+    //     Object.getOwnPropertyDescriptors({
+    //         foo: 123
+    //     })
+    // )
+}
+
+// Object.getOwnPropertyDescriptors()也可以实现Mixin（混入）模式。
+
+{
+    let mix = (object) => ({
+        with: (...mixins) => mixins.reduce(
+            (c, mixin) => Object.create(
+                c, Object.getOwnPropertyDescriptors(mixin)
+            ), object
+        )
+    })
+    let a = {a: 'a'};
+    let b = {b: 'b'};
+    let c = {c: 'c'};
+    let d = mix(c).with(a, b);
+    console.log(d.a); // a
+    console.log(d.b); // b
+    console.log(d.c); // c
+}
+
+console.log('============================================================');
+
+// _proto_属性，Object.setPrototypeOf()，Object.getPrototypeOf()
+// JavaScript语言的对象继承是通过原型链实现的。ES6提供了更多原型对象的操作方法。
+
+// Object.setPrototypeOf()
+
+// Object.setPrototypeOf()方法的作用与_proto_相同，同来设置一个对象的原型对象（prototype），返回参数对象本身
+
+{
+    // 格式
+    Object.setPrototypeOf(object, prototype)
+
+    // 用法
+    const o = Object.setPrototypeOf({}, null);
+}
+
+{
+    // 等同于
+    function setPrototypeOf(obj, proto) {
+        obj._proto_ = proto;
+        return obj;
+    }
+}
+
+{
+    
+}
