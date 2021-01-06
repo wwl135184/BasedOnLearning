@@ -312,7 +312,7 @@ console.log('============================================================');
 
 {
     // 格式
-    Object.setPrototypeOf(object, prototype)
+    // Object.setPrototypeOf(object, prototype)
 
     // 用法
     const o = Object.setPrototypeOf({}, null);
@@ -327,5 +327,174 @@ console.log('============================================================');
 }
 
 {
-    
+    let proto = {};
+    let obj = { x: 10 };
+    Object.setPrototypeOf(obj, proto);
+
+    proto.y = 20;
+    proto.z = 40;
+
+    console.log(Object.getPrototypeOf(obj));
+    console.log(obj.y); // 20
+    console.log(obj.z); // 40
+}
+
+// 如果第一个参数不是对象，会自动转化为对象。由于返回的还是第一个参数，所以这个操作不会产生任何的效果
+
+{
+    console.log(Object.setPrototypeOf(1, {}) === 1); // true
+    console.log(Object.setPrototypeOf('foo', {}) === 'foo'); // true
+    console.log(Object.setPrototypeOf(true, {}) === true); // true
+}
+
+// 由于undefined和null无法转化为对象，所以第一个参数是undefined或null，就会报错
+
+console.log('============================================================');
+
+// Object.getPrototypeOf()
+// 该方法与Object.setPrototypeOf配套使用，用于读取一个对象的原型对象。
+
+{
+    const obj = {};
+    Object.getPrototypeOf(obj);
+}
+
+{
+    function Rectangle() {
+
+    }
+    const rec = new Rectangle();
+    console.log(Object.getPrototypeOf(rec) === Rectangle.prototype); // true
+}
+
+// 如果参数不是对象，会自动转化为对象
+
+{
+    console.log(Object.getPrototypeOf(1)); // [Number: 0]
+    console.log(Object.getPrototypeOf('foo')); // [String: '']
+    console.log(Object.getPrototypeOf(true)); // [Boolean: false]
+}
+
+console.log('============================================================');
+
+// Object.keys()、Object.values()、Object.entries()
+
+// Object.keys()方法，返回一个数组，成员是参数对象自身的（不含继承的）所有遍历（enumerable）属性的键名
+
+{
+    const obj = { foo: 'bar', baz: 42 };
+    console.log(Object.keys(obj)); // ['foo', 'baz']
+}
+
+{
+    let { keys, values, entries } = Object;
+    let obj = { a: 1, b: 2, c: 3 };
+    for(let key of keys(obj)) {
+        console.log(key); 
+    }
+    for(let value of values(obj)) {
+        console.log(value);
+    }
+    for(let [key, value] of entries(obj)) {
+        console.log([key, value]);
+    }
+}
+
+// Object.values()
+
+{
+    const obj = { a: 1, b: 2 };
+    console.log(Object.values(obj)); // [1, 2]
+}
+
+// Object.values()只会返回对象自身的可遍历属性
+
+{
+    const obj = Object.create({}, {p: { value: 2, enumerable: true }});
+    console.log(Object.values(obj)); // ['2']
+}
+
+// Object.values()会过滤属性名为Symbol值的属性
+
+{
+    console.log(Object.values({ [Symbol()]: '123', foo: 'abc' })); // ['abc']
+}
+
+// 如果参数不是对象，Object.values会将起转化为对象。由于数值和布尔值的包装对象，都不会为实例添加非继承的属性。Object.values()会返回空数组
+
+{
+    console.log(Object.values(1)); // []
+    console.log(Object.values(true)); // []
+}
+
+// Object.entries()
+
+{
+    const obj = { foo: 'abc', baz: 42 };
+    console.log(Object.entries(obj)); // [ [ 'foo', 'abc' ], [ 'baz', 42 ] ]
+}
+
+// 原对象的属性名是一个Symbol值，该属性会被忽略
+
+{
+    console.log(Object.entries({ [Symbol()]: 'foo', abc: 1 })); // [ [ 'abc': 1 ] ]
+}
+
+// Object.entries()的基本用途是遍历对象的属性
+
+{
+    const obj = { a: 1, b: 2, c: 3 };
+    for(let [key, value] of Object.entries(obj)) {
+        console.log([key, value]);
+    }
+}
+
+// Object.entries()的另一个用处是，将对象转化为真正的Map结构
+
+{
+    const obj = { foo: 'bar', baz: 42 };
+    const map = new Map(Object.entries(obj));
+    console.log(map); // Map { 'foo' => 'bar', 'baz' => 42 }
+}
+
+// 实现Object.entries()
+
+{
+    // Generator函数的版本
+    function* entries(obj) {
+        for(let key of Object.keys(obj)) {
+            yield [key, obj[key]];
+        }
+    }
+}
+
+{
+    // 非Generator函数的版本
+    function entries(obj) {
+        let arr = [];
+        for(let key of Object.keys(obj)) {
+            arr.push([key, obj[key]]);
+        }
+        return arr;
+    }
+}
+
+console.log('============================================================');
+
+// Object.fromEntries()
+// Object.fromEntries()方法是Object.entries()的逆操作，用于将一个键值对数组转化为对象
+
+{
+    const obj = Object.fromEntries([
+        ['foo', 'bar'],
+        ['baz', 42]
+    ]);
+    console.log(obj);
+}
+
+// 该方法的一个用处是配合URLSearchParams对象，将查询字符串转化为独享
+
+{
+    const params = Object.fromEntries(new URLSearchParams('foo=bar&baz=qux'));
+    console.log(params);
 }
