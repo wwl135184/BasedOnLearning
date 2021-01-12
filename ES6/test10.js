@@ -453,8 +453,211 @@ console.log('============================================================');
 
 // T2定义了Symbol.species属性，T1没有。T1调用的是自身的构造方法，而T2调用的是Promise的构造方法
 
-// Symbol.species的作用在于，实例对象在运行的过程中，需要再次强调自身的构造函数时，会调用该属性指定的构造函数
+// Symbol.species的作用在于，实例对象在运行的过程中，需要再次强调自身的构造函数时，会调用该属性指定的构造函数。它的主要用途是，有些类库是在基类的基础上修改，那么子类使用继承的方法，可能希望返回基类的实例，而不是子类的实例
+
+console.log('============================================================');
+
+// Symbol.match
+// 对象Symbol.match属性，指向一个函数，当执行str.match(myObject)时，如果该属性存在，会调用它，返回该方法的返回值
 
 {
-    
+    // String.prototype.match(regexp)
+    // 等同于
+    // regexp[Symbol.match](this)
+
+    class MyMatcher {
+        [Symbol.match](string) {
+            return 'hello world'.indexOf(string);
+        }
+    }
+    console.log('e'.match(new MyMatcher())); // 1
 }
+
+console.log('============================================================');
+
+// Symbol.replace
+// 对象的Symbol.replace属性，指向一个方法，当该对象被String.prototype.repalce方法调用时，会返回该方法的返回值
+
+{
+    // String.prototype.replace(searchValue, replaceValue);
+    // 等同于
+    // searchValue[Symbol.replace](this, replaceValue);
+}
+
+{
+    const x = {};
+    x[Symbol.replace] = (...s) => console.log(s); 
+
+    'hello'.replace(x, 'world'); // ['hello', 'world']
+}
+
+console.log('============================================================');
+
+// Symbol.search
+// 对象的Symbol.search属性，指向一个方法，当该对象被String.prototype.search方法调用时，会放回该方法的返回值
+
+{
+    // String.prototype.search(regxp);
+    // 等同于
+    // regexp[Symbol.search](this);
+
+    class MySearch {
+        constructor(value) {
+            this.value = value;
+        }
+        [Symbol.search](string) {
+            return string.indexOf(this.value);
+        }
+    }
+    console.log('foobar'.search(new MySearch('foo'))); // 0
+}
+
+console.log('============================================================');
+
+// Symbol.split
+// 对象的Symbol.split属性，指向一个方法，当该对象被string.prototype.split方法调用时，会返回该方法的返回值
+
+{
+    // String.prototype.split(separator, limit);
+    // 等同于
+    // separator[Symbol.split](this, limit);
+
+    class MySplitter {
+        constructor(value) {
+            this.value = value;
+        }
+        [Symbol.split](string) {
+            let index = string.indexOf(this.value);
+            if(index === -1) {
+                return string;
+            }
+            return [
+                string.substr(0, index),
+                string.substr(index + this.value.length)
+            ]
+        }
+    }
+    console.log('foobar'.split(new MySplitter('foo'))); // ['', 'bar']
+    console.log('foobar'.split(new MySplitter('bar'))); // ['foo', '']
+    console.log('foobar'.split(new MySplitter('baz'))); // foobar
+}
+
+console.log('============================================================');
+
+// Symbol.iterator
+// 对象的Symbol.iterator属性，指向该对象的默认遍历器方法
+
+{
+    const myIterable = {};
+    myIterable[Symbol.iterator] = function* () {
+        yield 1;
+        yield 2;
+        yield 3;
+    }
+    console.log([...myIterable]); // [1, 2, 3]
+}
+
+// 对象进行for...of循环时，会调用Symbol.iterator方法，返回该对象的默认遍历器
+
+{
+    class Collection {
+        *[Symbol.iterator]() {
+            let i = 0;
+            while(this[i] !== undefined) {
+                yield this[i];
+                ++i;
+            }
+        }
+    }
+    let myCollection = new Collection();
+    myCollection[0] = 1;
+    myCollection[1] = 2;
+    for(let value of myCollection) {
+        console.log(value); 
+    }
+}
+
+console.log('============================================================');
+
+// Symbol.toPrimitive
+// 对象的Symbol.toPrimitive属性，指向一个方法。该方法被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值
+// Symbol.toPrimitive被调用时，会接受一个字符串，表示当前的运算模式，一共有三种模式。Number：该场合需要转成数值 String：该场合需要转成字符串 Default 该场合可以转成数值，也可以转成字符串
+
+{
+    let obj = {
+        [Symbol.toPrimitive](hint) {
+            switch(hint) {
+                case 'number':
+                    return 123;
+                case 'string':
+                    return 'str';
+                case 'default':
+                    return 'default';
+                default:
+                    throw new Error();
+            }
+        }
+    }
+    console.log(2 * obj); // 246
+    console.log(3 + obj); // 3default
+    console.log(obj == 'default'); // true
+    console.log(String(obj)); // str
+}
+
+console.log('============================================================');
+
+// Symbol.toStringTag
+// 对象的Symbol.toStringTag属性，指向一个方法。在该对象上面调用
+// Object.prototype.toString方法时，如果这个属性存在，它的返回值会出现在toString方法返回的字符串之中，表示对象的类型。也就是说，这个属性可以用来定制[Object Object]或[Object Array]中object后面的那个字符串
+
+{
+    // 例一
+    console.log(({[Symbol.toStringTag]: 'Foo'}.toString())); // [object Foo]
+
+    // 列二
+    class Collection {
+        get [Symbol.toStringTag]() {
+            return 'xxx';
+        }
+    }
+    let x = new Collection();
+    console.log(Object.prototype.toString.call(x)); // [object xxx]
+}
+
+console.log('============================================================');
+
+// Symbol.unscopables
+// 对象的Symbol.unscopeables属性，指向一个对象。该对象指定了使用with关键字时，哪些属性会被with环境排除
+
+{
+    console.log(Array.prototype[Symbol.unscopables]);
+    console.log(Object.keys(Array.prototype[Symbol.unscopables]));
+}
+
+{
+    class MyClass {
+        foo() {
+            return 1;
+        }
+    }
+    var foo = function() { return 2; };
+    with (MyClass.prototype) {
+        console.log(foo()); // 1
+    }
+}
+
+// 有unscopables时
+{
+    class MyClass {
+        foo() { return 1; }
+        get [Symbol.unscopables]() {
+            return { foo: true };
+        }
+    }
+    var foo = function() { return 2; };
+    with (MyClass.prototype) {
+        console.log(foo()); // 2
+    }
+}
+
+// 上面代码通过指定Symbol.unscopables属性，使得with语法块不会在当前作用域寻找foo属性，即foo将指向外层作用域的变量
