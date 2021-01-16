@@ -86,5 +86,129 @@ console.log('============================================================');
 
 {
     // 对象的写法
+    const properties = {
+        width: 1,
+        height: 1
+    }
+    // if(properties[someName]) {
+
+    // }
+}
+
+{
+    // Set的写法
+    const properties= new Set();
+    properties.add('width');
+    properties.add('height');
+    // if(properties.has(someName)) {
+
+    // }
+}
+
+// Array.from方法可以将Set结构转化为数组
+
+{
+    const s = new Set([1, 2, 3, 3, 4, 5]);
+    console.log(typeof(s)); // Object
+    console.log(s); // Set { 1, 2, 3, 4, 5}
+    const arr = Array.from(s);
+    console.log(arr); // [1, 2, 3, 4, 5]
+}
+
+// 去除数组重复成员
+
+{
+    function dedupe(array) {
+        return Array.from(new Set(array));
+    }
+    console.log(dedupe([1, 1, 1, 2, 3, 4])); // [1 , 2, 3, 4]
+}
+
+console.log('============================================================');
+
+// 遍历操作
+
+// Set结构的实例有四个遍历方法，可以用于遍历成员
+// Set.prototype.keys() 返回建名的遍历器
+// Set.prototype.values() 返回键值的遍历器
+// Set.prototype.entries() 放回键值遍历器
+// Set.prototype.forEach() 使用回调函数编辑每个成员
+
+// keys(), values(), entries()
+
+{
+    let set = new Set(['red', 'green', 'blue']);
+
+    for(let item of set.keys()) {
+        console.log(item);
+    }
     
+    for(let item of set.values()) {
+        console.log(item);
+    }
+
+    for(let item of set.entries()) {
+        console.log(item); // ['red', 'red'] ['green', 'green] ['blue', 'blue']
+    }
+}
+
+// Set结构的实例默认可遍历，它的默认编辑器生成函数就是它的values方法
+
+{
+    let set = new Set([1, 2, 3, 4, 5]);
+    for(let item of set) {
+        console.log(item);
+    }
+}
+
+//  forEach()
+
+// Set结构的实例与数组一样，也用forEach方法，对于每个成员执行某种操作，没有返回值
+
+{
+    let set = new Set([1, 4, 9]);
+    set.forEach((value, key) => console.log(key + ':' + value));
+}
+
+// 函数的参数与数组的forEach一致，依次为键值、键名、集合本身，Set结构的键名就是键值，因此第一参数与第二个参数的值永远都是一样的
+
+// 遍历的应用
+// 扩展运算符...内部使用for...of循环，也可以用于Set结构
+
+{
+    let set = new Set(['red', 'green', 'blue']);
+    let arr = [...set];
+    console.log(arr); // ['red', 'green', 'blue']
+}
+
+// map和filter方法也可以间接用于Set
+
+{
+    let set = new Set([1, 2, 3, 4]);
+    set = new Set([...set].map(item => item * 2));
+    console.log(set); // Set { 2, 3, 6, 8 }
+}
+
+{
+    let set = new Set([1, 2, 3, 4, 5, 6]);
+    set = new Set([...set].filter(item => (item % 2) === 0));
+    console.log(set); // Set { 2, 4, 6 }
+}
+
+// Union、Intersect、Difference
+
+{
+    let a = new Set([2, 3, 4, 5, 6]);
+    let b = new Set([4, 3, 2, 5]);
+    // 并集
+    let union = new Set([...a, ...b]);
+    console.log(union); // Set { 1, 2, 3, 4 }
+
+    // 交集
+    let intersect = new Set([...a].filter(x => b.has(x)));
+    console.log(intersect); // Set { 2, 3 }
+
+    // 差集
+    let difference = new Set([...a].filter(x => !b.has(x)));
+    console.log(difference); // Set { 6 }
 }
