@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        html {
+            width: 100%;
+            height: 100%;
+        }
+        .main {
+            height: 100%;
+            /* 水平垂直居中： flex布局 */
+            /* display: flex; */
+
+            /* justify-content: center;
+            align-items: center; */
+
+            /* 水平垂直居中：grid布局 */
+            /* display: grid; */
+        }
+        .box {
+            width: 100px;
+            height: 100px;
+            background: red;
+            /* 水平居中 */
+            /* margin: 0 auto; */
+
+            /* 水平垂直居中：absolute + -margin */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -50px;
+            margin-left: -50px;
+
+            /* 水平垂直居中：absolute + transform: translate translate %移动的距离是盒子自身的宽度和高度来对比 */
+            /* position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); */
+
+            /* 水平垂直居中：absolute + calc calc()函数可以使用数字属性值来执行加、减、乘、除四则运算 */ 
+            /* position: absolute;
+            top: calc(50% - 50px);
+            left: calc(50% - 50px); */
+
+            /* 水平垂直居中：absolute + margin: auto top, right, bottom, left值相等即可，必须设定宽度与高度 */
+            /* position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto; */
+
+            /* 水平垂直居中：flex + margin: auto */
+            /* margin: auto; */
+
+            /* 水平垂直居中：grid布局 */
+            /* justify-self: center;
+            align-self: center; */
+
+            /* 水平垂直居中：grid布局 */
+            /* margin: auto; */
+        }
+        .box1 {
+            width: 50px;
+            height: 50px;
+            background: green;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+        }
+        .label {
+            float: left;
+            color: #000;
+            font-size: 12px;
+            line-height: 10px;
+            transform: scale(0.833333);
+            /* 兼容性写法 */
+            -webkit-transform: scale(0.833333);
+            -moz-transform: scale(0.833333);
+            -o-transform: scale(0.833333);
+            -ms-transform: scale(0.833333);
+            /* 浏览器内核 */
+            /* Trident：ie浏览器 Gecko：火狐浏览器 webkit：谷歌浏览器、百度浏览器 presto: opera浏览器 */
+        }
+    </style>
+    <body class="main">
+        <div class="box">
+            <div class="box1">
+                <span class="label">我们</span>
+            </div>
+        </div>
+    </body>
+</html>
