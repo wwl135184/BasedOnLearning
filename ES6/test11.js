@@ -212,3 +212,19 @@ console.log('============================================================');
     let difference = new Set([...a].filter(x => !b.has(x)));
     console.log(difference); // Set { 6 }
 }
+
+// 遍历操作，同步改变原来的Set结构
+
+{
+    // map
+    let set = new Set([1, 2, 3]);
+    set = new Set([...set].map(item => item * 2));
+    console.log(set); // Set { 2, 4, 6 }
+}
+
+{
+    // Array.from
+    let set = new Set([1, 2, 3]);
+    set = new Set(Array.from(set, val => val * 2));
+    console.log(set); // Set { 2, 4, 6 }
+}
