@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            width: 100%;
+            height: 100%;
+        }
+        /* transition 简写属性，用于在一个属性中设置四个过渡属性
+            transition: all 0 ease 0;
+        */
+        /* transition-property 规定应用过渡的css属性的名称
+            transition-property: none | all | property; none 没有属性会获取过度效果 all 所有属性都将获取过渡效果 property 定义应用过渡效果css属性名称列表，列表以逗号分开。
+        */
+        /* transition-duration 定义过渡效果花费的时间
+            transition-duration: time
+        */
+        /* transition-timing-function 规定过渡效果的时间曲线
+            transition-timing-function: linear | ease | ease-in | ease-out | ease-in-out | cubic-bezier(n, n, n, n)
+        */
+        /* transition-delay 规定过渡效果何时开始
+            transition-delay: time
+        */
+        .box {
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+        .box:hover {
+            width: 200px;
+            transition: width 2s ease;
+            -webkit-transition: width 2s ease;
+        }
+    </style>
+    <body>
+        <div class="box"></div>
+    </body>
+    <script type="text/javascript">
+
+    </script>
+</html>
