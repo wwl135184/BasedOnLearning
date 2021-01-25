@@ -228,3 +228,115 @@ console.log('============================================================');
     set = new Set(Array.from(set, val => val * 2));
     console.log(set); // Set { 2, 4, 6 }
 }
+
+console.log('============================================================');
+
+// WeakSet
+
+// WeakSet结构与Set类似，也是不重复的值的集合。但是，它与Set有两个区别。
+// 首先，WeakSet的成员只能是对象，而不是其他类型的值
+
+{
+    const ws = new WeakSet()
+    // ws.add(1); Invalid value used in weak set
+    // ws.add(Symbol()); Invalid value used in weak set
+    console.log(ws);
+}
+
+// WeakSet只能放置对象
+// WeakSet不可遍历
+
+// WeakSet可以接受一个数组或类似数组的对象作为参数。（实际上，任何具有Iterable接口的对象，都可以作为WeakSet的参数。）该数组的所有成员，都会自动成为WeakSet实例对象的成员。
+
+{
+    const a = [[1, 2], [3, 4]];
+    const ws = new WeakSet(a);
+    console.log(ws);
+}
+
+{
+    const b = [3, 4];
+    // const ws = new WeakSet(b); Invalid value used in weak set
+    // console.log(ws);
+}
+
+// WeakSet结构有以下三个方法
+// WeakSet.prototype.add(value)：向WeakSet实例添加一个新成员
+// WeakSet.prototype.delete(value): 向清除WeakSet实例的指定成员
+// WeakSet.prototype.has(value)：返回一个布尔值，表示某个值是否在
+
+{
+    let ws = new WeakSet();
+    const obj = {};
+    const foo = {};
+
+    ws.add(obj);
+    ws.add(foo);
+
+    console.log(ws.has(obj)); // true
+    console.log(ws.has(foo)); // true
+
+    ws.delete(foo);
+    console.log(ws.has(foo)); // false
+}
+
+// WeakSet没有size属性，没有办法遍历它的成员
+
+{
+    const ws = new WeakSet();
+    console.log(ws.size); // undefined
+    console.log(ws.forEach); // undefined
+    // ws.forEach(function(item) { console.log('WeakSet has' + item) }); ws.function is not a function
+}
+
+// WeakSet的一个用处，是存储DOM节点，而不用担心这些节点从文档移除时，会引发内存泄漏
+
+{
+    const foos = new WeakSet();
+    class Foo {
+        constructor() {
+            foos.add(this);
+        }
+        method() {
+            if(!foos.has(this)) {
+                throw new TypeError('Foo.prototype.method 只能在Foo的实例上调用！');
+            }
+        }
+    }
+}
+
+console.log('============================================================');
+
+// Map
+
+// JavaScript的对象(Object)，本质是键值对的集合（Hash结构），但传统上只能用字符串当作键。
+// Map数据结构。类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对像）都可以当作键值。
+// Object结构提供了“字符串-值”的对应，Map结构提供了“值-值”的对应，是一种更完善的Hash结构实现。“键值对”的数据结构，Map比Object更合适。
+
+{
+    const m = new Map();
+    const o = { p: 'hello world' };
+    m.set(o, 'content');
+    console.log(m.get(o)); // content
+
+    console.log(m.has(o)); // true
+    console.log(m.delete(o)); // true
+    console.log(m.has(o)); // false
+}
+
+// Map结构的set方法，将对象o当作m的一个键，然后又使用get方法读取这个键，接着使用delete方法删除了这个键。
+
+// Map也可以接受一个数组作为参数。该数组的成员是一个个表示键值对的数组。
+
+{
+    const map = new Map([
+        ['name', '张三'],
+        ['age', 20]
+    ]);
+
+    console.log(map.size); // 2
+    console.log(map.has('name')); // true
+    console.log(map.get('name')); // 张三
+    console.log(map.get('age')); // 20
+    console.log(map.has('title')); // false
+}
