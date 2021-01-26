@@ -340,3 +340,44 @@ console.log('============================================================');
     console.log(map.get('age')); // 20
     console.log(map.has('title')); // false
 }
+
+// Map构造函数接受数组作为参数，实际上执行的是下面的算法
+
+{
+    const items = [
+        ['name', '张三'],
+        ['title', 'Author']
+    ]
+    const map = new Map();
+    items.forEach(([key, value]) => map.set(key, value));
+}
+
+// Set和Map都可以用来生成新的Map
+
+{
+    const set = new Set([
+        ['foo', 1],
+        ['bar', 2]
+    ])
+    const m1 = new Map(set);
+    console.log(m1.get('foo')); // 1
+
+    const m2 = new Map([['baz', 3]]);
+    const m3 = new Map(m2);
+    console.log(m3.get('baz')); // 3
+}
+
+// 如果对同一个键多次赋值，后面的值将覆盖前面的值
+
+{
+    const map = new Map();
+    map.set(1, 'aaa');
+    map.set(1, 'bbb');
+    console.log(map.get(1)); // bbb
+}
+
+// 如果读取一个未知键，则返回undefined
+
+{
+    console.log(new Map().get('name')); // undefined
+}
