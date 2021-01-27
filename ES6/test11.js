@@ -381,3 +381,199 @@ console.log('============================================================');
 {
     console.log(new Map().get('name')); // undefined
 }
+
+// 只有对同一个对象的引用，Map结构才将其视为同一个键
+
+{
+    const map = new Map();
+    map.set(['a'], 555);
+    console.log(map.get(['a'])); // undefined
+}
+
+// set和get方法，表面试针对同一个键值，但实际上这是两个不同的数组实例，内存地址不一样的，因此get方法无法读取该键，返回undefined
+// 同样的值的两个实例，在Map结构中被视为两个键 
+
+{
+    const map = new Map();
+    const k1 = ['a'];
+    const k2 = ['a'];
+
+    map.set(k1, 111);
+    map.set(k2, 222);
+    console.log(map.get(['a'])); // undefined
+
+    console.log(map.get(k1)); // 111
+    console.log(map.get(k2)); // 222
+}
+
+// Map的键是一个简单类型的值（数字、字符串、布尔值），则只要两个值严格相等，Map将其视为一个键，0和-0就是一个键，布尔值true和字符串‘true’则是两个不同的键
+// undefined和null也是两个不同的键。虽然NaN不严格相等于自身，但Map将其视为同一个键
+
+{
+    console.log(0 === -0); // true
+    console.log(true === 'true'); // false
+    console.log(NaN === NaN); // false
+
+    let map = new Map();
+
+    map.set(-0, 123);
+    console.log(map.get(+0)); // 123
+
+    map.set(true, 1);
+    console.log(map.get('true')); // undefined
+
+    map.set(undefined, 2);
+    console.log(map.get(null)); // undefined
+
+    map.set(NaN, 3);
+    console.log(map.get(NaN)); // 3
+}
+
+console.log('============================================================');
+
+// 实例的属性和操作方法
+
+// size 
+
+{
+    const map = new Map();
+    map.set('foo', true);
+    map.set('bar', true);
+    console.log(map.size); // 2
+}
+
+// Map.prototype.set(key, value)
+
+{
+    const m = new Map();
+    m.set('edition', 6); // 键是字符串
+    m.set(262, 'standard'); // 键是数值
+    m.set(undefined, 'nah'); // 键是undefined
+}
+
+// Map.prototype.get(key);
+
+{
+    const m = new Map();
+    const hello = function() { console.log('hello') };
+    m.set(hello, 'Hello ES6'); // 键是函数
+    console.log(m.get(hello)); // Hello ES6
+}
+
+// Map.prototype.has(key)
+
+{
+    const m = new Map();
+    
+    m.set('foo', 1111);
+    m.set(2222, 3333);
+    m.set(undefined, 4444);
+
+    console.log(m.has('foo')); // true
+    console.log(m.has(2222)); // true
+    console.log(m.has(undefined)); // true
+}
+
+// Map.prototype.delete(key) 
+
+{
+    const m = new Map();
+
+    m.set(undefined, 1111);
+    console.log(m.has(undefined)); // true
+
+    m.delete(undefined);
+    console.log(m.get(undefined)); // undefined
+}
+
+// Map.prototype.clear()
+
+{
+    const m = new Map();
+    m.set('foo', true);
+    m.set('bar', false);
+
+    console.log(m.size); // 2
+    m.clear();
+    console.log(m.size); // 0
+}
+
+console.log('============================================================');
+
+// 遍历方法
+
+// Map.ptototype.keys()：返回键名的遍历器
+// Map.prototype.values()：返回键值的遍历器
+// Map.prototype.entries()：返回所有成员的遍历器
+// Map.prototype.forEach()：遍历Map的所有成员
+
+// Map的遍历顺序就是插入顺序
+
+{
+    const map = new Map([
+        ['F', 'no'],
+        ['T', 'yes']
+    ])
+
+    for(let key of map.keys()) {
+        console.log(key); // F T
+    }
+
+    for(let value of map.values()) {
+        console.log(value); // no yes
+    }
+
+    for(let item of map.entries()) {
+        console.log(item); // ['F', 'no'] ['T', 'yes']
+    }
+
+    for(let [key, value] of map.entries()) {
+        console.log(key, value);
+    }
+
+    for(let [key, value] of map) {
+        console.log(key, value);
+    }
+}
+
+// 表示Map结构的默认遍历器接口(Symbol.iterator属性)，就是entries方法
+
+{
+    const map = new Map();
+    console.log(map[Symbol.iterator] === map.entries); // true
+}
+
+// Map结构转化为数组结构，比较快速的方法是使用扩展运算符(...)
+
+{
+    const map = new Map([
+        [1, 'one'],
+        [2, 'two'],
+        [3, 'three']
+    ])
+
+    console.log([...map.keys()]); // [1, 2, 3]
+    console.log([...map.values()]); // ['one', 'two', 'three']
+    console.log([...map.entries()]); // [[1, 'one'], [2, 'two'], [3, 'three']]
+}
+
+// 结合数组的map方法、filter方法，可以实现Map的遍历和过滤（Map本身没有map和filter方法）
+
+{
+    const map0 = new Map();
+    map0.set(1, 'a');
+    map0.set(2, 'b');
+    map0.set(3, 'c');
+
+    const map1 = new Map(
+        [...map0].filter(([k, v]) => k < 3)
+    );
+    console.log([...map1.keys()]); // [1, 2]
+    
+    const map2 = new Map(
+        [...map0].map(([k, v]) => [k * 2, '_' + v])
+    );
+    console.log([...map2.keys()]); // [2, 4, 6]
+}
+
+// 
