@@ -576,4 +576,100 @@ console.log('============================================================');
     console.log([...map2.keys()]); // [2, 4, 6]
 }
 
-// 
+// Map还有一个forEach方法，与数组的forEach方法类似，也可以实现遍历
+
+{
+    const map = new Map();
+    map.forEach(function(value, key, map) {
+        console.log("Key: %s, Value: %s", key, value);
+    }) 
+}
+
+// forEach方法还可以接受第二个参数，用来绑定this
+
+{
+    const map = new Map();
+    const reporter = {
+        repoter: function(key, value) {
+            console.log("Key: %s, Value: %s", key, value)
+        }
+    };
+
+    map.forEach(function(value, key, map) {
+        this.repoter(key, value);
+    }, reporter)
+}
+
+// forEach方法的回调函数this，就指向reporter
+
+console.log('============================================================');
+
+// 与其他数据结构互相转换
+
+// Map转为数组
+// Map转化为数组最方便的方法，就是使用扩展运算符(...)
+
+{
+    const myMap = new Map();
+    myMap.set(1, 'aaa');
+    myMap.set(2, 'bbb');
+    myMap.set(3, 'ccc');
+    console.log([...myMap.values()]); // ['aaa', 'bbb', 'ccc']
+}
+
+// 数组转化为Map
+// 将数组传入Map构造函数，就可以转为Map
+
+{
+    const map = new Map([
+        [1, 'aaa'],
+        [2, 'bbb']
+    ])
+    console.log(map); // Map {1 => 'aaa', 2 => 'bbb'}
+}
+
+// Map转化为对象
+// Map的键都是字符串，它可以无损的转化为对象
+
+{
+    function strMapToObj(strMap) {
+        let Obj = {};
+        for(let [key, value] of strMap) {
+            Obj[key] = value;
+        }
+        return Obj;
+    }
+
+    const myMap = new Map();
+    myMap.set('yes', true);
+    myMap.set('no', false);
+    console.log(strMapToObj(myMap)); // {'yes': true, 'no': false}
+}
+
+// 对象转为Map
+// 对象转为Map可以通过Object.entries()
+
+{
+    let obj = {'a': 1, 'b': 2};
+    console.log(Object.entries(obj));
+    let map = new Map(Object.entries(obj));
+    console.log(map); // Map { 'a' => 1, 'b' => 2 }
+}
+
+{
+    function objToStrMap(obj) {
+        let strMap = new Map();
+        for(let k of Object.keys(obj)) {
+            strMap.set(k, obj[k]);
+        }
+        return strMap;
+    }
+    console.log(objToStrMap({'a': 1, 'b': 2})); // Map { 'a' => 1, 'b' => 2 }
+}
+
+// Map转为JSON
+// Map转为JSON要区分两种情况，Map的建名都是字符串，这是可以选择转化为对象JSON
+
+{
+    
+}
