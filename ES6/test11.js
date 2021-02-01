@@ -671,5 +671,159 @@ console.log('============================================================');
 // Map转为JSON要区分两种情况，Map的建名都是字符串，这是可以选择转化为对象JSON
 
 {
-    
+    function strMapToObj(strMap) {
+        let obj = {};
+        for(let [key,  value] of strMap) {
+            obj[key] = value;
+        }
+        return obj;
+    }
+    function strMapToJson(strMap) {
+        return JSON.stringify(strMapToObj(strMap));
+    }
+    let myMap = new Map().set('yes', true).set('no', false);
+    console.log(strMapToJson(myMap)); // {"yes":true,"no":false}
 }
+
+// 另一情况是，Map的键名非有字符串，这时可以选择转为书JSON
+
+{
+    function mapToArrayJson(map) {
+        return JSON.stringify([...map]);
+    }
+
+    let myMap = new Map().set(true, 7).set({foo: 3}, ['abc']);
+    console.log(mapToArrayJson(myMap)); // [[true, 7], [{"foo":3},["abc"]]]
+}
+
+// JSON转化为Map
+// JSON转为Map，正常情况下，所有键名都是字符串
+
+{
+    function objToStrMap(jsonStr) {
+        return new Map(Object.entries(jsonStr));
+    }
+    function jsonToStrMap(jsonStr) {
+        return objToStrMap(JSON.parse(jsonStr));
+    }
+    let jsonStr = '{"yes": true, "no": false}';
+    console.log(jsonToStrMap(jsonStr)); // Map { 'yes' => true, 'no' => fasle }
+}
+
+// Map转为数据JSON的逆操作
+
+{
+    function jsonToMap(jsonStr) {
+        return new Map(JSON.parse(jsonStr));
+    }
+    console.log(jsonToMap('[[true, 7], [{"foo": 3}, ["abc"]]]')); // Map { true => 7, { foo: 3 } => ['abc'] }
+}
+
+console.log('============================================================');
+
+// WeakMap
+
+// WeakMap与Map结构类似，也是用于生成键值对的集合
+
+// WeakMap也可以接受一个数组，作为构造函数的参数
+
+{
+    const wm1 = new WeakMap();
+    const key = { foo: 1 };
+    wm1.set(key, 2);
+    console.log(wm1.get(key)); // 2
+
+    const k1 = [1, 2, 3];
+    const k2 = [4, 5, 6];
+    const wm2 = new WeakMap([[k1, 'foo'], [k2, 'bar']]);
+    console.log(wm2.get(k1)); // foo
+}
+
+// WeakMap与Map的区别有两点
+
+// WeakMap只接受对象作为键名(null除外)，不接受其他类型的值作为键名
+
+{
+    const map = new WeakMap();
+    // map.set(1, 2);
+    // map.set(Symbol(), 2);
+    // map.set(null, 2);
+}
+
+// 数值1和Symbol值作为WeakMap的键名，都会报错
+
+// 其次，Weakmap的键名所指的对象，不计入垃圾回收机制
+
+// WeakMap的专业场合就是，它的键所对应的对象，可能会在将来消失，WeakMap结构有助于防止内存泄漏
+
+// WeakMap弱引用的只是健名，而不是键值。键值依然是正常引用
+
+{
+    const wm = new WeakMap();
+    let key = {};
+    let obj = {foo: 1};
+
+    wm.set(key, obj);
+    obj = null;
+    console.log(wm.get(key)); // { foo: 1 }
+}
+
+// 键值obj是正常引用，WeakMap外部消除了obj的引用，WeakMap内部引用依然存在
+
+console.log('============================================================');
+
+// WeakMap的语法
+
+// get()、set()、has()、delete()
+
+{
+    const wm = new WeakMap();
+    console.log(wm.size); // undefined
+    console.log(wm.forEach); // undefined
+    console.log(wm.clear); // undefined
+}
+
+console.log('============================================================');
+
+// WeakMap用途
+
+// WeakMap应用的典型场合就是DOM节点作为键名
+
+{
+    let myWeakMap = new WeakMap();
+
+    // myWeakMap.set(document.getElementById('logo), {timesClicked: 0})
+    // document.getElementById('logo').addEventListener('click', function() {
+        // let logoData = myWeakmap.get(document.getElementById('logo'));
+        // logoData = timesClicked++;
+    // }, false);
+}
+
+// WeakMap的另一个用处是部署私有属性
+
+{
+    const _counter = new WeakMap();
+    const _action = new WeakMap();
+
+    class Countdown {
+        constructor(counter, action) {
+            _counter.set(this, counter);
+            _action.set(this, action);
+        }
+        dec() {
+            let counter = _counter.get(this);
+            if(counter < 1) return;
+            counter--;
+            _counter.set(this, counter);
+            if(counter === 0) {
+                _action.get(this)();
+            }
+        }
+    }
+
+    const c = new Countdown(1, () => console.log('DONE'));
+    c.dec(); // DONE
+    c.dec();
+}
+
+// Countdwon类的两个内部属性_counter和_action，是实例的弱引用，所以如果删除实例，它们也就随之消失，不会造成内存泄漏
