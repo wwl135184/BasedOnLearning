@@ -134,3 +134,139 @@ console.log('============================================================');
 // apply(target, object, args)：拦截Proxy实例作为函数调用的操作，比如proxy(...agrs)、proxy.call(Object, ...args)、proxy.apply(...)
 
 // construct(target, args)：拦截Proxy实例作为构造函数调用的操作，比如new proxy(..args)
+
+console.log('============================================================');
+
+// Proxy实例方法
+
+// get()
+// get()方法用于拦截某个属性的读取操作，可以接受三个参数，依次为目标对象、属性名和proxy实力本身，其中最后一个参数可选
+
+{
+    const person = {
+        name: '张三'
+    }
+    const proxy = new Proxy(person, {
+        get: function(target, propKey) {
+            if(propKey in target) {
+                return target[propKey];
+            } else {
+                throw new ReferenceError("Prop name \"" + propKey + "\" does not exist.");
+            }
+        }
+    })
+    console.log(proxy.name); // 张三
+    // console.log(proxy.age); // 抛出一个错误
+}
+
+// get方法可以继承
+
+{
+    let proto = new Proxy({}, {
+        get(target, propertyKey, receiver) {
+            console.log('GET ' + propertyKey);
+            return target[propertyKey];
+        }
+    })
+
+    let obj = Object.create(proto);
+    obj.foo; // GET foo
+}
+
+// 上面代码中，拦截操作定义在Prototype对象上面，所以如果读取obj对象继承的属性时，拦截会失效
+
+// 使用get拦截，实现数组读取负数的索引
+
+{
+    function createArray(...elements) {
+        let handler = {
+            get(target, propKey, receiver) {
+                let index = Number(propKey);
+                if(index < 0) {
+                    propKey = String(target.length + index);
+                }
+                return Reflect.get(target, propKey, receiver);
+            }
+        }
+        let target = [];
+        target.push(...elements);
+        return new Proxy(target, handler);
+    }
+
+    let arr = createArray('a', 'b', 'c');
+    console.log(arr[-1]); // c
+    console.log(arr[0]); // a
+    console.log(arr[-2]); // b
+    console.log(arr[-3]); // a
+}
+
+// 利用Proxy，可以将读取属性的操作(get)，转变为执行某个函数，从而实现属性的链式操作
+
+{
+    const pipe = function(value) {
+        let funcStack = [];
+        const oproxy = new Proxy({}, {
+            get: function(pipeObject, fnName) {
+                if(fnName === 'get') {
+                    return funcStack.reduce((val, fn) => {
+                        return fn(val);
+                    }, value);
+                }
+                funcStack.push(window[fnName]);
+                return oproxy;
+            }
+        });
+        return oproxy;
+    }
+    const double = n => n * 2;
+    const pow = n => n * n;
+    const reverseInt = n => n.toString().split("").reverse().join("") | 0;
+
+    // console.log(pipe(3).double.pow.reverseInt.get); // 63
+}
+
+// get拦截，实现一个生成各种DOM节点的通用函数dom
+
+{
+    const dom = new Proxy({}, {
+        get(target, property) {
+            return function(attrs = {}, ...children) {
+                const el = document.createElement(property);
+                for(let prop of Object.keys(attrs)) {
+                    el.setAttribute(prop, arrts[prop]);
+                }
+                for(let child of children) {
+                    if(typeof child === 'string') {
+                        child = document.createTextNode(child);
+                    }
+                    el.appendChild(child);
+                }
+                return el;
+            }
+        }
+    });
+}
+
+// get方法的第三个参数的例子，它总是指向原始的读操作所在的那个对象，一般情况下就是Proxy实例
+
+{
+    const proxy = new Proxy({}, {
+        get: function(target, key, receiver) {
+            return receiver;
+        }
+    });
+    console.log(proxy.getRecevier === proxy); // true
+}
+
+// proxy对象的getRecevier属性是由proxy对象提供的，所以receiver指向proxy对象
+
+{
+    const proxy = new Proxy({}, {
+        get: function(target, key, receiver) {
+            return receiver;
+        }
+    });
+
+    const d = Object.create(proxy);
+    console.log(d.a === d); // true
+}
