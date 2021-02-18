@@ -270,3 +270,169 @@ console.log('============================================================');
     const d = Object.create(proxy);
     console.log(d.a === d); // true
 }
+
+// 如果一个属性不可配置（configurable）且不可写（writable），则Proxy不能修改该属性，否则通过Proxy对象访问该属性会报错
+
+{
+    const target = Object.defineProperties({}, {
+        foo: {
+            value: 123,
+            writable: true, // false
+            configurable: true // fasle
+        }
+    });
+    const handler = {
+        get(target, propKey) {
+            return 'abc';
+        }
+    }
+    const proxy = new Proxy(target, handler);
+    console.log(proxy.foo); // abc
+}
+
+console.log('============================================================');
+
+// set()
+// set方法用来拦截某个属性的赋值操作，可以接受四个参数，一次为目标对象、属性名、属性值和Proxy实例本身，其中最后一个参数可选
+
+{
+    let vaildator = {
+        set: function(obj, prop, value) {
+            if(prop === 'age') {
+                if(!Number.isInteger(value)) {
+                    throw new TypeError('The age is not an integer');
+                }
+                if(value > 200) {
+                    throw new RangeError('The age seems invalid');
+                }
+            }
+            obj[prop] = value;
+        }
+    }
+    let person = new Proxy({}, vaildator);
+    person.age = 100;
+    console.log(person.age); // 100
+    // person.age = 300; 
+}
+
+// 利用set方法，还可以数据绑定，即每当对象发生变化时，会自动更新DOM
+
+// 对象上面设置内部属性，属性名的第一个字符使用下划线开头，表示这些属性不应该被外部使用。结合get和set方法，就可以做到防止这些内部属性被外部读写。
+
+{
+    const handler = {
+        get(target, key) {
+            invariant(key, 'get');
+            return target[key];
+        },
+        set(target, key, value) {
+            invariant(key, 'set');
+            target[key] = value;
+            return true;
+        }
+    }
+    function invariant(key, action) {
+        if(key[0] === '_') {
+            console.log(`${action} ${key}`);
+        }
+    }
+    const target = {};
+    const proxy = new Proxy(target, handler);
+    proxy._prop; // get_prop
+    proxy._prop = 'c'; // set_prop
+}
+
+// set方法的第四个参数receiver，指的是原始的操作行为所在的那个对象，一般情况下是proxy本身
+
+{
+    const handler = {
+        set: function(obj, prop, value, receiver) {
+            console.log(value);
+            obj[prop] = receiver;
+        } 
+    }
+    const proxy = new Proxy({}, handler);
+    proxy.foo = 'bar';
+    console.log(proxy.foo === proxy); // true
+}
+
+{
+    const handler = {
+        set: function(obj, prop, value, receiver) {
+            obj[prop] = receiver;
+        }
+    }
+    const proxy = new Proxy({}, handler);
+    const myObj = {};
+    Object.setPrototypeOf(myObj, proxy);
+    myObj.foo = 'bar';
+    console.log(myObj.foo === myObj); // true
+}
+
+// myObj.foo属性的值时，myObj并没有foo属性，因此引擎会到myObj的原型链去找foo属性。myObj的原型对象proxy是一个Proxy实例，设置它的foo属性会触发set方法。这时，第四个参数receiver就指向原始赋值行为所在的对象myObj
+
+// 目标对象自身的某个属性不可写，那么set方法将不起作用
+
+{
+    const obj = {};
+    Object.defineProperty(obj, 'foo', {
+        value: 'bar',
+        writable: false
+    })
+
+    const handler = {
+        set: function(obj, prop, value, receiver) {
+            obj[prop] = 'baz';
+        }
+    }
+
+    const proxy = new Proxy(obj, handler);
+    obj.prop = 'baz';
+    console.log(obj.prop); // baz
+}
+
+// 上面代码中，obj.foo属性不可写，Proxy对这个属性set代理将不会生效
+
+// 严格模式下，set代理返回false或者undefined，就会报错
+
+{
+    const handler = {
+        set: function(obj, prop, value, receiver) {
+            obj[prop] = receiver;
+            return false;
+        }
+    }
+
+    const proxy = new Proxy({}, handler);
+    proxy.foo = 'bar';
+}
+
+// 上面代码中，在严格模式下，set代理返回false或undefined，都会报错
+
+console.log('============================================================');
+
+// apply()
+
+// apply方法拦截函数的调用，call和apply操作
+
+// apply方法可以接受三个参数，分别是目标对象，目标对象的上下文(this)和目标对象的参数数组
+
+{
+    const handler = {
+        apply(target, ctx, ages) {
+            return Reflect.apply(...arguments);
+        }
+    }
+}
+
+{
+    const target = () => 'I am the target';
+    const handler = {
+        apply: function() {
+            return 'I am the proxy';
+        }
+    }
+
+    const p = new Proxy(target, handler);
+    console.log(p()); // I am the proxy
+}
