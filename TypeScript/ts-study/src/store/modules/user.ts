@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 interface UserInfo {
-    userName: string,
+    userName: string | number,
     nickName: string | number,
     token: string
 }
