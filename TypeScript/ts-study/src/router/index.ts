@@ -12,6 +12,12 @@ const routes: RouteRecordRaw[] = [{
         path: 'index',
         component: () => import('@/views/index.vue'),
         name: 'index'
+      },
+      // 目录
+      {
+        path: 'base-type',
+        component: () => import('@/views/ts/base-type.vue'),
+        name: 'base-type'
       }
     ]
 }]
