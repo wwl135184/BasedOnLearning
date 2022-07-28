@@ -1,4 +1,5 @@
 <template>
+  <!-- 基础类型 -->
   <div class="p-[16px]">
     <div>
       <span v-if="isBool">1、布尔值</span>
@@ -15,9 +16,14 @@
       <span class="mr-[16px]">4、数组</span>
       <el-button v-for="num in isArr" :key="num">{{ num }}</el-button>
     </div>
+
     <div class="mt-[16px]">
       <span>5、枚举 </span>
-      <span>{{ c }}</span>
+      <span>{{ c }} {{ b }}</span>
+    </div>
+    <div class="mt-[16px]">
+      <span>6、Any </span>
+      <span>{{ notSure }}</span>
     </div>
   </div>
 </template>
@@ -38,10 +44,42 @@ const x: [number, string] = [1, "string"];
 // 枚举
 const enum Color {
   Red,
-  Green,
+  Green = 3,
   Blue,
 }
-let c: Color = Color.Green;
+const c: Color = Color.Green;
+const b: string = Color["3"];
+// Any
+let notSure: any = 4;
+notSure = true;
+notSure = "any";
+// Void
+const warnUser = (): void => {
+  console.log("This is my warning message");
+};
+const unusable: void = undefined;
+// Null和Undefined
+const u: undefined = undefined;
+const n: null = null;
+// 可以把null和undefined赋予给number值
+// Never
+const error = (msg: string): never => {
+  throw new Error(msg);
+};
+const fail = (): never => {
+  return error("Something failed");
+};
+// Object
+// object表示非原始类型，也就是除number，string，boolean，symbol，null或undefined之外的类型
+const create = (o: object | null): void => {};
+create({ prop: 0 });
+// 类型断言
+// 类型断言有两种形式
+// 尖括号
+const someValue: any = "this is a string";
+const strLength: number = (<string>someValue).length;
+// as
+const strLengthAs: number = (someValue as string).length;
 </script>
 
 <style lang="scss" scoped></style>

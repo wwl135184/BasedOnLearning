@@ -14,10 +14,17 @@ const routes: RouteRecordRaw[] = [{
         name: 'index'
       },
       // 目录
+      // 基础类型
       {
         path: 'base-type',
         component: () => import('@/views/ts/base-type.vue'),
         name: 'base-type'
+      },
+      // 变量声明
+      {
+        path: 'variable-declarations',
+        component: () => import('@/views/ts/variable-declarations.vue'),
+        name: 'variable-declarations'
       }
     ]
 }]
