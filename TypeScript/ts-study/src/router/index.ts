@@ -25,6 +25,12 @@ const routes: RouteRecordRaw[] = [{
         path: 'variable-declarations',
         component: () => import('@/views/ts/variable-declarations.vue'),
         name: 'variable-declarations'
+      },
+      // 接口
+      {
+        path: 'interface',
+        component: () => import('@/views/ts/interface.vue'),
+        name: 'interface'
       }
     ]
 }]

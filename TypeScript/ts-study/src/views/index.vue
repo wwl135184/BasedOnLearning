@@ -20,6 +20,14 @@ const catalogue: Catalogue[] = [
     name: "基础类型",
     path: "/base-type",
   },
+  {
+    name: "变量声明",
+    path: "/variable-declarations",
+  },
+  {
+    name: "接口",
+    path: "/interface",
+  },
 ];
 
 const btnClick = (v: Catalogue) => {
