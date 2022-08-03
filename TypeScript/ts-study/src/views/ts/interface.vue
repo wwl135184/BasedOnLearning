@@ -1,11 +1,14 @@
 <template>
-  <div class="p-[16px]"></div>
+  <div class="p-[16px]">
+    <div>
+      <span>1、接口继承</span>
+      <div>{{ squreSecond.color }}</div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { StringNullableChain } from "lodash";
-import { ref } from "vue";
-import { stringifyQuery } from "vue-router";
+import { ref, Ref } from "vue";
 
 // 接口
 interface LabelledValue {
@@ -82,6 +85,144 @@ let myStr: string = myArray[0];
 console.log(myStr); // Bold
 
 // TypeScript支持两种索引签名：字符串和数字。
-</script>
+// 字符串索引签名能能够很好的描述dictionary模式，并且它们也确保所有属性与其返回值类型相匹配。
+interface NumberDictionary {
+  [index: string]: number;
+  length: number;
+}
 
+// 可以将索签名设置为只读，这样就防止了给索引赋值。
+interface ReadonlyStringArray {
+  readonly [index: number]: string;
+}
+let myArr: ReadonlyStringArray = ["Alice", "Bob"];
+
+// 类类型
+// 实现接口
+// TypeScript也能够用它来明确的强制一个类去符合某种契约。
+// 在接口中描述一个方法，在类里实现它
+
+interface ClockInterface {
+  currentTime: Date;
+  setTime(d: Date): void;
+}
+
+class Clock implements ClockInterface {
+  currentTime: Date;
+  setTime(d: Date) {
+    this.currentTime = d;
+  }
+  constructor(h: number, m: number) {}
+}
+
+// 静态部分与实例部分的区别
+interface ClockConstructor {
+  new (hour: number, minute: number): vaid;
+}
+
+class ClockSecond implements ClockConstructor {
+  currentTime: Date;
+  constructor(h: number, m: number) {}
+}
+
+// 当一个类实现了一个接口时，只对其实例部分进行检查。construct存在于类的静态部分，所以不在的检查范围内。
+// 直接操作类的静态部分
+interface ClockConstructorSecond {
+  new (hour: number, minute: number): ClockInterfaceSecond;
+}
+interface ClockInterfaceSecond {
+  tick();
+}
+
+const createClock = (
+  ctor: ClockConstructorSecond,
+  hour: number,
+  minute: number
+): ClockInterfaceSecond => {
+  return new ctor(hour, minute);
+};
+
+class DigitalClock implements ClockInterfaceSecond {
+  constructor(h: number, m: number) {}
+  tick() {
+    console.log("beep beep");
+  }
+}
+
+class AnalogClock implements ClockInterfaceSecond {
+  constructor(h: number, m: number) {}
+  tick() {
+    console.log("tick tock");
+  }
+}
+
+let digital = createClock(DigitalClock, 12, 17);
+let analog = createClock(AnalogClock, 12, 17);
+
+// 继承接口
+// 和类一样，接口也可以相互继承。
+interface Shape {
+  color: string;
+}
+
+interface Square extends Shape {
+  sideLength: number;
+}
+
+let squre = <Square>{};
+squre.color = "red";
+squre.sideLength = 10;
+
+// 一个接口可以继承多个接口，创建出多个接口的合成接口。
+interface PenStroke {
+  penWidth: number;
+}
+
+interface SqureSecond extends Shape, PenStroke {
+  sideLength: number;
+}
+
+let squreSecond = ref({}) as Ref<SqureSecond>;
+squreSecond.value.color = "white";
+squreSecond.value.penWidth = 10;
+squreSecond.value.sideLength = 10;
+
+// 混合类型
+// 一个对象可以同时具有上面提到的多种类型。
+
+interface Counter {
+  (start: number): string;
+  interval: number;
+  reset(): volid;
+}
+
+const getCounter = (): Counter => {
+  let counter = <Counter>function (start: number) {};
+  counter.interval = 123;
+  counter.reset = function () {};
+  return counter;
+};
+
+let c = getCounter();
+c(10);
+c.reset();
+c.interval = 5.0;
+
+// 接口继承类
+class Control {
+  private state: any;
+}
+
+interface SelectableControl extends Control {
+  select(): vaid;
+}
+
+class Button extends Control implements SelectableControl {
+  select() {}
+}
+
+class TextBox extends Control {
+  select() {}
+}
+</script>
 <style lang="scss" scoped></style>

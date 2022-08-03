@@ -28,6 +28,10 @@ const catalogue: Catalogue[] = [
     name: "接口",
     path: "/interface",
   },
+  {
+    name: "类",
+    path: "/class",
+  },
 ];
 
 const btnClick = (v: Catalogue) => {

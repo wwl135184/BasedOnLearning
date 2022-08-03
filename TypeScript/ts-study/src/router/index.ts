@@ -31,7 +31,13 @@ const routes: RouteRecordRaw[] = [{
         path: 'interface',
         component: () => import('@/views/ts/interface.vue'),
         name: 'interface'
-      }
+      },
+      // 类
+      {
+        path: 'class',
+        component: () => import('@/views/ts/class.vue'),
+        name: 'class'
+      },
     ]
 }]
 
