@@ -1,4 +1,8 @@
-<template></template>
+<template>
+  <div>
+    <div class="p-[16px] font-bold">类</div>
+  </div>
+</template>
 
 <script lang="ts" setup>
 import { Ref, ref, reactive } from "vue";
@@ -10,7 +14,7 @@ class Greeter {
     this.greeting = message;
   }
   greet() {
-    return `Hello,${this.greeting}`;
+    return `Hello, ${this.greeting}!`;
   }
 }
 let greeter = new Greeter("word");
@@ -83,12 +87,103 @@ class AnimalThird {
   }
 }
 
-// 指定private
+// 理解private
 // 当成员被标记成private时，它就不能在声明它的类的外部访问
 class AnimalFourthly {
   private name: string;
-  constructor(theName: string) {}
+  constructor(theName: string) {
+    this.name = theName;
+  }
 }
+
+new AnimalFourthly("Cat").name; // 错误：'name'是私有的
+
+// TypeScript使用的是结构类型系统。当我们比较两种不同的类型时，并不在乎它们从何处而来，如果所有成员的类型都是兼容的，我们就认为它们的类型是兼容的。
+
+// 然而，当我们比较带有private或protected成员类型的时候，情况就不同了。如果其中一个类型包含一个private成员，那么只有当另外一个类型中也存在这样一个private成员，
+// 并且它们都来自同一处声明时，我们认为这两个类型是兼容的。对于protected成员也使用这个规则。
+
+class AnimalFifth {
+  private name: string;
+  constructor(theName: string) {
+    this.name = theName;
+  }
+}
+
+class Rhino extends AnimalFifth {
+  constructor() {
+    super("Rhino");
+  }
+}
+
+class Employee {
+  private name: string;
+  constructor(theName: string) {
+    this.name = theName;
+  }
+}
+
+let animalFifth = new AnimalFifth("Goat"),
+  rhino = new Rhino(),
+  employee = new Employee("Bob");
+
+animalFifth = rhino;
+animalFifth = employee; // 错误：animalFifth与employee不兼容
+
+// 理解protected
+
+// protected修饰符与private修饰符的行为很相似，但有一点不同，protected成员在派生类中仍然可以访问。
+
+class Preson {
+  protected name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+class EmployeeSecond extends Preson {
+  private department: string;
+  constructor(name: string, deparment: string) {
+    super(name);
+    this.department = deparment;
+  }
+  public getElevatorPitch() {
+    return `Hello, my name is ${this.name} and I work in ${this.department}`;
+  }
+}
+
+let howord = new EmployeeSecond("Hello", "Sales");
+
+console.log(howord.getElevatorPitch());
+console.log(howord.name);
+
+// 注意，我们不能在Person类外使用name，但我们仍然可以通过Employee类的实例方法访问，因为Employee是由Person派生而来的。
+
+// 构造函数也可以被标记为protected。这意味着这个类不能包含它的类外被实例化，但是能被继承。
+
+class PresonSecond {
+  protected name: string;
+  protected constructor(theName: string) {
+    this.name = theName;
+  }
+}
+
+class EmployeeThird extends PresonSecond {
+  private department: string;
+  constructor(name: string, department: string) {
+    super(name);
+    this.department = department;
+  }
+
+  public getElevatorPitch() {
+    return `Hello, my name is ${this.name} and I work in ${this.department}`;
+  }
+}
+
+let howordSecond = new EmployeeThird("Howard", "Sales");
+let john = new Preson("John"); // 错误：'Person'的构造函数是被保护的
+
+// readOnly修饰符
 </script>
 
 <style lang="scss" scoped></style>
