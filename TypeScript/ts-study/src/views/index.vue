@@ -32,6 +32,10 @@ const catalogue: Catalogue[] = [
     name: "类",
     path: "/class",
   },
+  {
+    name: "函数",
+    path: "/function",
+  },
 ];
 
 const btnClick = (v: Catalogue) => {

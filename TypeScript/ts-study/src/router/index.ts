@@ -38,6 +38,12 @@ const routes: RouteRecordRaw[] = [{
         component: () => import('@/views/ts/class.vue'),
         name: 'class'
       },
+      // 函数
+      {
+        path: 'function',
+        component: () => import('@/views/ts/function.vue'),
+        name: 'function'
+      }
     ]
 }]
 
