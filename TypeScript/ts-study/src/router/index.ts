@@ -43,6 +43,12 @@ const routes: RouteRecordRaw[] = [{
         path: 'function',
         component: () => import('@/views/ts/function.vue'),
         name: 'function'
+      },
+      // 泛型
+      {
+        path: 'genericity',
+        component: () => import('@/views/ts/genericity.vue'),
+        name: 'genericity'
       }
     ]
 }]
