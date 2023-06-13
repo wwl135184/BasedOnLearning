@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ar } from "element-plus/es/locale";
 import { ref, reactive } from "vue";
 // 泛型
 

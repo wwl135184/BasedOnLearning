@@ -49,6 +49,12 @@ const routes: RouteRecordRaw[] = [{
         path: 'genericity',
         component: () => import('@/views/ts/genericity.vue'),
         name: 'genericity'
+      },
+      // 枚举
+      {
+        path: '/enumeration',
+        component: () => import('@/views/ts/enumeration.vue'),
+        name: 'enumeration'
       }
     ]
 }]

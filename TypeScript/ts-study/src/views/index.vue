@@ -40,6 +40,10 @@ const catalogue: Catalogue[] = [
     name: "泛型",
     path: "/genericity",
   },
+  {
+    name: "枚举",
+    path: "/enumeration",
+  },
 ];
 
 const btnClick = (v: Catalogue) => {
